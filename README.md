@@ -7,4 +7,6 @@ npm install puppeteer
 
 node server.js
 node background.js
+
+http://localhost:3000/stream.html
 ```
