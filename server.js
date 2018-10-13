@@ -2,11 +2,30 @@ const child_process = require('child_process');
 const express = require('express');
 const WebSocketServer = require('ws').Server;
 const http = require('http');
+const { NodeMediaServer } = require('node-media-server');
+
 
 const app = express();
 const server = http.createServer(app).listen(3000, () => {
   console.log('Listening...');
 });
+
+const config = {
+  rtmp: {
+    port: 1935,
+    chunk_size: 60000,
+    gop_cache: true,
+    ping: 60,
+    ping_timeout: 30
+  },
+  http: {
+    port: 8000,
+    allow_origin: '*'
+  }
+};
+
+var nms = new NodeMediaServer(config)
+nms.run();
 
 const wss = new WebSocketServer({
   server: server
@@ -22,13 +41,14 @@ app.use(express.static(__dirname + '/www'));
 wss.on('connection', (ws) => {
 
   //const rtmpUrl = decodeURIComponent(match[1]);
-  const rtmpUrl = __dirname + '/www/' + 'test.webm'
-
+  //const rtmpUrl = __dirname + '/www/' + 'test.webm'
+  const rtmpUrl = "rtmp://localhost/live/STREAM_NAME"
 
   console.log('Target RTMP URL:', rtmpUrl);
 
   // Launch FFmpeg to handle all appropriate transcoding, muxing, and RTMP
   const ffmpeg = child_process.spawn('ffmpeg', [
+    /*
     '-y',
 
     '-i', '-',
@@ -53,6 +73,37 @@ wss.on('connection', (ws) => {
 
     '-acodec', 'libvorbis',
 
+    rtmpUrl
+    */
+
+    // Facebook requires an audio track, so we create a silent one here.
+    // Remove this line, as well as `-shortest`, if you send audio from the browser.
+    '-f', 'lavfi', '-i', 'anullsrc',
+
+    // FFmpeg will read input video from STDIN
+    '-i', '-',
+
+    // Because we're using a generated audio source which never ends,
+    // specify that we'll stop at end of other input.  Remove this line if you
+    // send audio from the browser.
+    '-shortest',
+
+    // If we're encoding H.264 in-browser, we can set the video codec to 'copy'
+    // so that we don't waste any CPU and quality with unnecessary transcoding.
+    // If the browser doesn't support H.264, set the video codec to 'libx264'
+    // or similar to transcode it to H.264 here on the server.
+    '-vcodec', 'libx264',
+
+    // AAC audio is required for Facebook Live.  No browser currently supports
+    // encoding AAC, so we must transcode the audio to AAC here on the server.
+    '-acodec', 'aac',
+
+    // FLV is the container format used in conjunction with RTMP
+    '-f', 'flv',
+
+    // The output RTMP URL.
+    // For debugging, you could set this to a filename like 'test.flv', and play
+    // the resulting file with VLC.
     rtmpUrl
   ]);
 
