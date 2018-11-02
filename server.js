@@ -43,6 +43,8 @@ wss.on('connection', (ws) => {
   //const rtmpUrl = decodeURIComponent(match[1]);
   //const rtmpUrl = __dirname + '/www/' + 'test.webm'
   const rtmpUrl = "rtmp://localhost/live/STREAM_NAME"
+  //const rtmpUrl = 'icecast://source:aishwarya@localhost:7000/adhitya';
+
 
   console.log('Target RTMP URL:', rtmpUrl);
 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Video Overlay Tutorial - Leaflet</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" type="image/x-icon" href="https://leafletjs.com/examples/video-overlay/docs/images/favicon.ico">
+  <link rel="stylesheet" href="leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin="">
+  <script src="leaflet.js" integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q==" crossorigin=""></script>
+	<script src="https://cdn.bootcss.com/flv.js/1.4.0/flv.min.js"></script>
+
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 600px;
+			height: 400px;
+		}
+	</style>
+
+
+</head>
+<body>
+
+<div id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;">
+
+<script>
+	var map = L.map('map');
+
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+		maxZoom: 18,
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+			'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+			'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+		id: 'mapbox.satellite'
+	}).addTo(map);
+
+	var videoUrls = [
+		//'http://dl3.webmfiles.org/big-buck-bunny_trailer.webm'
+		"ya31.webm"
+	],
+	bounds = L.latLngBounds([[ 32, -130], [ 13, -100]]);
+
+	map.fitBounds(bounds);
+
+	var overlay = L.videoOverlay(videoUrls, bounds, {
+		opacity: 0.8,
+		interactive: false,
+		autoplay: false
+	});
+	map.addLayer(overlay);
+
+	overlay.on('load', function () {
+		var MyPauseControl = L.Control.extend({
+			onAdd: function() {
+				var button = L.DomUtil.create('button');
+				button.innerHTML = '⏸';
+				L.DomEvent.on(button, 'click', function () {
+					overlay.getElement().pause();
+				});
+				return button;
+			}
+		});
+		var MyPlayControl = L.Control.extend({
+			onAdd: function() {
+				var button = L.DomUtil.create('button');
+				button.innerHTML = '▶️';
+				L.DomEvent.on(button, 'click', function () {
+					overlay.getElement().play();
+				});
+				return button;
+			}
+		});
+
+
+		var MyRewindControl = L.Control.extend({
+			onAdd: function() {
+				var button = L.DomUtil.create('button');
+				button.innerHTML = '⏪';
+				L.DomEvent.on(button, 'click', function () {
+					overlay.getElement().currentTime -= 1;
+				});
+				return button;
+			}
+		});
+
+		var MyForwardControl = L.Control.extend({
+			onAdd: function() {
+				var button = L.DomUtil.create('button');
+				button.innerHTML = '⏩';
+				L.DomEvent.on(button, 'click', function () {
+					overlay.getElement().currentTime += 5;
+				});
+				return button;
+			}
+		});
+
+		var MyRestartControl = L.Control.extend({
+			onAdd: function() {
+				var button = L.DomUtil.create('button');
+				button.innerHTML = '⏮';
+				L.DomEvent.on(button, 'click', function () {
+					overlay.getElement().currentTime = 0;
+				});
+				return button;
+			}
+		});
+
+
+		var pauseControl = (new MyPauseControl()).addTo(map);
+		var playControl = (new MyPlayControl()).addTo(map);
+		var rewindControl = (new MyRewindControl()).addTo(map);
+		var forwardControl = (new MyForwardControl()).addTo(map);
+		var restartControl = (new MyRestartControl()).addTo(map);
+	});
+
+	function ready() {
+    console.log("Everything is ready");
+		var videoElement = document.querySelector("video");
+		console.log(videoElement);
+		videoElement.pause();
+		//videoElement.play();
+
+		if (flvjs.isSupported()) {
+				var flvPlayer = flvjs.createPlayer({
+						type: 'flv',
+						isLive: true,
+						url: 'http://localhost:8000/live/STREAM_NAME.flv'
+				});
+				flvPlayer.attachMediaElement(videoElement);
+				flvPlayer.load();
+				flvPlayer.play();
+
+				console.log('Video should have started playing! [if server is running] :)');
+		}
+
+  }
+
+	document.addEventListener("DOMContentLoaded", ready);
+</script>
+
+
+
+
+
+</body></html>
