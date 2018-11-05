@@ -40,43 +40,12 @@ app.use(express.static(__dirname + '/www'));
 
 wss.on('connection', (ws) => {
 
-  //const rtmpUrl = decodeURIComponent(match[1]);
-  //const rtmpUrl = __dirname + '/www/' + 'test.webm'
-  const rtmpUrl = "rtmp://localhost/live/STREAM_NAME"
-  //const rtmpUrl = 'icecast://source:aishwarya@localhost:7000/adhitya';
-
+  const rtmpUrl = "rtmp://localhost/live/STREAM_NAME";
 
   console.log('Target RTMP URL:', rtmpUrl);
 
   // Launch FFmpeg to handle all appropriate transcoding, muxing, and RTMP
   const ffmpeg = child_process.spawn('ffmpeg', [
-    /*
-    '-y',
-
-    '-i', '-',
-
-    '-f', 'webm',
-
-    '-dash', '1',
-
-    '-cluster_size_limit', '2M',
-
-    '-cluster_time_limit', '5100',
-
-    '-content_type', 'video/webm',
-
-    '-keyint_min', '90',
-
-    '-tile-columns', '4',
-
-    '-frame-parallel', '1',
-
-    '-vcodec', 'libvpx-vp9',
-
-    '-acodec', 'libvorbis',
-
-    rtmpUrl
-    */
 
     // We create a silent one here.
     // Remove this line, as well as `-shortest`, if you send audio from the browser.

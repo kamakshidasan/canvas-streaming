@@ -124,6 +124,16 @@
 		videoElement.pause();
 		//videoElement.play();
 
+			var interval = setInterval(function(){
+			 promise = videoElement.play();
+			 if (promise !== undefined) {
+					 promise.then(_ => {
+							 clearInterval(interval);
+					 }).catch(error => {
+					 });
+			 }
+	 }, 100);
+
 		if (flvjs.isSupported()) {
 				var flvPlayer = flvjs.createPlayer({
 						type: 'flv',

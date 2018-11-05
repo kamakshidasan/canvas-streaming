@@ -1,48 +1,8 @@
-<!doctype html>
-<html>
- <head>
-   <meta charset="utf-8">
-    <script src="js/canvasFill.js"></script>
-   <script>
-     document.addEventListener('DOMContentLoaded', () => {
-           let mediaRecorder;
-           let mediaStream;
+<!DOCTYPE html>
 
-           const ws = new WebSocket(
-             window.location.protocol.replace('http', 'ws') + '//' + // http: => ws:, https: -> wss:
-             window.location.host +
-             '/rtmp/' +
-             'whatever'
-           );
-
-           ws.addEventListener('open', (e) => {
-             console.log('WebSocket Open', e);
-             mediaStream = document.querySelector('canvas').captureStream(30); // 30 FPS
-             mediaRecorder = new MediaRecorder(mediaStream, {
-               mimeType: 'video/webm;codecs=h264',
-               videoBitsPerSecond : 3000000
-             });
-
-             mediaRecorder.addEventListener('dataavailable', (e) => {
-               ws.send(e.data);
-             });
-
-             mediaRecorder.addEventListener('stop', ws.close.bind(ws));
-
-             mediaRecorder.start(1000); // Start recording, and dump data every second
-
-
-           });
-
-           ws.addEventListener('close', (e) => {
-             console.log('WebSocket Close', e);
-             mediaRecorder.stop();
-           });
-
-     });
-   </script>
- </head>
- <body>
-  <canvas width="640" height="360"></canvas>
- </body>
+<html lang="en">
+  <body>
+    <script src="nami.js"></script>
+    <script src="main.js"></script>
+  </body>
 </html>
